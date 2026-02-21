@@ -4,7 +4,6 @@ import type { SkillStatusEntry, SkillStatusReport } from "../types.ts";
 import {
   isAllowedByPolicy,
   matchesList,
-  PROFILE_OPTIONS,
   resolveAgentConfig,
   resolveToolProfile,
   TOOL_SECTIONS,
@@ -86,29 +85,6 @@ export function renderAgentTools(params: {
     params.onOverridesChange(params.agentId, [...nextAllow], [...nextDeny]);
   };
 
-  const updateAll = (nextEnabled: boolean) => {
-    const nextAllow = new Set(
-      alsoAllow.map((entry) => normalizeToolName(entry)).filter((entry) => entry.length > 0),
-    );
-    const nextDeny = new Set(
-      deny.map((entry) => normalizeToolName(entry)).filter((entry) => entry.length > 0),
-    );
-    for (const toolId of toolIds) {
-      const baseAllowed = resolveAllowed(toolId).baseAllowed;
-      const normalized = normalizeToolName(toolId);
-      if (nextEnabled) {
-        nextDeny.delete(normalized);
-        if (!baseAllowed) {
-          nextAllow.add(normalized);
-        }
-      } else {
-        nextAllow.delete(normalized);
-        nextDeny.add(normalized);
-      }
-    }
-    params.onOverridesChange(params.agentId, [...nextAllow], [...nextDeny]);
-  };
-
   return html`
     <section class="card">
       <div class="row" style="justify-content: space-between;">
@@ -118,24 +94,6 @@ export function renderAgentTools(params: {
             Profile + per-tool overrides for this agent.
             <span class="mono">${enabledCount}/${toolIds.length}</span> enabled.
           </div>
-        </div>
-        <div class="row" style="gap: 8px;">
-          <button class="btn btn--sm" ?disabled=${!editable} @click=${() => updateAll(true)}>
-            Enable All
-          </button>
-          <button class="btn btn--sm" ?disabled=${!editable} @click=${() => updateAll(false)}>
-            Disable All
-          </button>
-          <button class="btn btn--sm" ?disabled=${params.configLoading} @click=${params.onConfigReload}>
-            Reload Config
-          </button>
-          <button
-            class="btn btn--sm primary"
-            ?disabled=${params.configSaving || !params.configDirty}
-            @click=${params.onConfigSave}
-          >
-            ${params.configSaving ? "Saving…" : "Save"}
-          </button>
         </div>
       </div>
 
@@ -186,30 +144,6 @@ export function renderAgentTools(params: {
               `
             : nothing
         }
-      </div>
-
-      <div class="agent-tools-presets" style="margin-top: 16px;">
-        <div class="label">Quick Presets</div>
-        <div class="agent-tools-buttons">
-          ${PROFILE_OPTIONS.map(
-            (option) => html`
-              <button
-                class="btn btn--sm ${profile === option.id ? "active" : ""}"
-                ?disabled=${!editable}
-                @click=${() => params.onProfileChange(params.agentId, option.id, true)}
-              >
-                ${option.label}
-              </button>
-            `,
-          )}
-          <button
-            class="btn btn--sm"
-            ?disabled=${!editable}
-            @click=${() => params.onProfileChange(params.agentId, null, false)}
-          >
-            Inherit
-          </button>
-        </div>
       </div>
 
       <div class="agent-tools-grid" style="margin-top: 20px;">
