@@ -132,6 +132,17 @@ export function renderApp(state: AppViewState) {
               <div class="brand-sub">Gateway Dashboard</div>
             </div>
           </div>
+          <div class="topbar-divider" aria-hidden="true"></div>
+          <div class="topbar-secured">
+            <span class="topbar-secured__label">Secured by</span>
+            <img
+              class="topbar-secured__logo"
+              src=${basePath ? `${basePath}/logo-crittora.svg` : "/logo-crittora.svg"}
+              alt="Crittora"
+              
+            />
+
+          </div>
         </div>
         <div class="topbar-status">
           <div class="pill">
