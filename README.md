@@ -1,4 +1,4 @@
-# 🦞 OpenClaw — Personal AI Assistant
+# 🦞 OpenClaw — Personal AI Assistant | Secured by Crittora
 
 <p align="center">
     <picture>
@@ -42,7 +42,208 @@ Model note: while any model is supported, I strongly recommend **Anthropic Pro/M
 - Models config + CLI: [Models](https://docs.openclaw.ai/concepts/models)
 - Auth profile rotation (OAuth vs API keys) + fallbacks: [Model failover](https://docs.openclaw.ai/concepts/model-failover)
 
-## Install (recommended)
+## Secured by Crittora Install
+
+This Crittora-secured OpenClaw setup adds a boot-time verification gate that replaces mutable config trust with a cryptographically verified policy artifact (`tools.crittora`). Before any tools initialize or network actions begin, the runtime authenticates and verifies the policy; if verification fails, startup halts (fail-closed). The goal is to reduce ambient authority and make startup behavior explicit, auditable, and tamper-evident.
+
+For more background on the design and security model, read the Crittora article: [Eliminating Ambient Authority in OpenClaw](https://www.crittora.com/lab/openclaw/).
+
+### Prerequisites
+
+- Ensure Docker is installed and running.
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/crittora/openclaw.git
+cd openclaw
+```
+
+### Run Docker Setup
+
+```bash
+./docker-setup.sh
+```
+
+### Interactive Setup Flow
+
+#### Confirmation
+
+```text
+◆ I understand this is powerful and inherently risky. Continue?
+  ● Yes / ○ No
+```
+
+#### Onboarding Mode
+
+```text
+◆ Onboarding mode
+  ○ QuickStart
+  ● Manual (configure port, network, Tailscale, and auth options)
+```
+
+#### Configuration Handling
+
+```text
+◆ Config handling
+  ● Use existing values
+  ○ Update values
+  ○ Reset
+```
+
+#### Gateway Selection
+
+```text
+◆ What do you want to set up?
+  ● Local gateway (this machine)
+    (ws://127.0.0.1:18789 detected)
+  ○ Remote gateway (info-only)
+```
+
+#### Workspace Directory
+
+```text
+◆ Workspace directory
+  /home/node/.openclaw/workspace
+```
+
+### Model and Authentication
+
+#### Model Provider
+
+```text
+◆ Model/auth provider
+  ● OpenAI (Codex OAuth + API key)
+  ○ Anthropic
+  ○ OpenRouter
+  ○ Google
+  ○ xAI (Grok)
+  ○ Hugging Face
+  ○ Others…
+```
+
+#### OpenAI Authentication Method
+
+```text
+◆ OpenAI auth method
+  ● OpenAI Codex (ChatGPT OAuth)
+  ○ OpenAI API key
+```
+
+1. Open the provided login link.
+2. Sign in with your OpenAI credentials.
+3. Copy the redirect URL.
+4. Paste it back into the OpenClaw setup prompt.
+
+Example:
+
+```text
+◆ Paste the redirect URL
+http://localhost:1455/auth/callback?code=...
+```
+
+### Model Selection
+
+```text
+◆ Default model
+  ● Keep current (openai-codex/gpt-5.2-codex)
+  ○ Enter model manually
+  ○ openai-codex/gpt-5.1
+  ○ openai-codex/gpt-5.3-codex
+```
+
+### Gateway Configuration
+
+#### Port and Binding
+
+```text
+◆ Gateway port
+  18789
+
+◆ Gateway bind
+  ● Loopback (127.0.0.1)
+  ○ LAN (0.0.0.0)
+  ○ Tailnet (Tailscale IP)
+  ○ Auto
+  ○ Custom IP
+```
+
+#### Authentication
+
+```text
+◆ Gateway auth
+  ● Password
+  ○ Token
+
+◆ Gateway password
+  ********
+```
+
+#### Tailscale Exposure
+
+```text
+◆ Tailscale exposure
+  ● Off
+  ○ Serve
+  ○ Funnel
+```
+
+### Optional Configuration
+
+```text
+◆ Configure chat channels now?
+  ○ Yes / ● No
+
+◆ Configure skills now? (recommended)
+  ○ Yes / ● No
+
+◆ Enable hooks?
+  ◼ Skip for now
+  ◻ 🚀 boot-md
+  ◻ 📎 bootstrap-extra-files
+  ◻ 📝 command-logger
+  ◻ 💾 session-memory
+
+◆ Enable zsh shell completion?
+  ○ Yes / ● No
+```
+
+### Installation Complete
+
+Access the UI:
+
+```text
+http://127.0.0.1:18789/
+```
+
+Go to `Overview` -> `Connect` and enter your gateway password.
+
+### Troubleshooting: Device Approval
+
+If the connection fails, approve the device manually.
+
+Approve pending device:
+
+```bash
+docker compose exec openclaw-gateway \
+  node dist/index.js devices approve
+```
+
+List devices:
+
+```bash
+docker compose exec openclaw-gateway \
+  node dist/index.js devices list
+```
+
+Approve a specific device ID:
+
+```bash
+docker compose exec openclaw-gateway \
+  node dist/index.js devices approve fe020f28-960c-4a86-b03c-798b914154bb
+```
+
+## OpenClaw Install (recommended)
 
 Runtime: **Node ≥22**.
 
@@ -55,7 +256,7 @@ openclaw onboard --install-daemon
 
 The wizard installs the Gateway daemon (launchd/systemd user service) so it stays running.
 
-## Quick start (TL;DR)
+## OpenClaw Quick start (TL;DR)
 
 Runtime: **Node ≥22**.
 
